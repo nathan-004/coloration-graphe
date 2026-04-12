@@ -1,9 +1,15 @@
+from collections import defaultdict
+
 class Graphe(dict):
     """Dictionnaire de dictionnaire sous la forme {'A': 5 } contenant les voisins"""
-    def __init__(self, iterable):
+    def __init__(self, iterable, positions: dict = {}):
         if self._is_valid_iterable(iterable):
             for key, val in iterable.items():
                 self[key] = val
+                
+        self.colors = defaultdict(lambda : None)
+        self.positions = defaultdict(lambda : None)
+        self.positions.update(positions)
 
     def _is_valid_iterable(self, iterable: dict):
         for value in iterable.values():

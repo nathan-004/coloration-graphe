@@ -1,4 +1,5 @@
 from graph import Graphe
+from display import display_graph
 
 noms_regions = [
     "Hauts-de-France",
@@ -23,9 +24,30 @@ dic_regions = {
     11: [9, 10]                # Provence-Alpes-Côte d'Azur
 }
 
+positions = {
+    0: (5, 9),
+    1: (3, 7),
+    2: (5, 7),
+    3: (7, 7),
+    4: (1, 5),
+    5: (3, 5),
+    6: (5, 5),
+    7: (7, 5),
+    8: (3, 3),
+    9: (6, 3),
+    10: (4, 1),
+    11: (7, 1)
+}
+
+positions = {
+    noms_regions[key]: value for key, value in positions.items()
+}
+
 regions = {
     noms_regions[key]: [noms_regions[v] for v in value] for key, value in dic_regions.items()
 }
 
-g = Graphe(regions)
+g = Graphe(regions, positions)
 print(g)
+
+display_graph(g)
