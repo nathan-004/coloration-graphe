@@ -31,6 +31,15 @@ class Region(dict):
     @property
     def bbox(self) -> Bbox:
         return self["bbox"]
+    
+    @property
+    def center(self):
+        minx, miny, maxx, maxy = self.bbox
+
+        return (
+            (minx + maxx) / 2,
+            (maxy + miny) / 2
+        )
 
 def distance(p1: tuple, p2: tuple) -> float:
     dr = p1[0] - p2[0]
@@ -181,8 +190,67 @@ def collide_bbox(r1: Region, r2: Region) -> bool:
         r2.bbox.miny > r2.bbox.maxy
     )
 
-def get_graph(regions: list[Region]) -> dict:
+def regions_touch(r1: Region, r2: Region, pixels, img_size: tuple, display: bool = False) -> bool:
+    res = Image.new("RGB", img_size)
+    outline_pixels = [
+        (x, y) for x, y in r1.pixels
+        if any([pixels[x+var_x, y+var_y] != (255, 255, 255) for var_x in range(-1, 2) for var_y in range(-1, 2) 
+                if 0 <= x + var_x < img_size[0] and 0 <= y + var_y < img_size[1]
+            ])
+    ]
+
+    for pixel in outline_pixels:
+        res.putpixel(pixel, (255, 0, 0))
+
+    outline_pixels.sort(key = lambda x : ((r2.center[0] - x[0])**2 + (r2.center[1] - x[1])**2)**0.5)
+
+    dest = r2.center
+
+    res.putpixel((int(dest[0]), int(dest[1])), (255, 0, 0))
+
+    pixs_r1 = set(r1.pixels)
+    pixs_r2 = set(r2.pixels)
+
+    for x, y in outline_pixels:
+        cur_pos = (x, y)
+        visited = set()
+
+        while True:
+            if cur_pos in pixs_r2 or cur_pos == dest:
+                if display:
+                    res.show()
+                return True
+            
+            if pixels[cur_pos] == (255, 255, 255) and not cur_pos in pixs_r1: # Pixel blanc pas dans r1 ou r2
+                break
+
+            min_d = float("inf")
+            next_pos = None
+
+            for nx in range(cur_pos[0]-1, cur_pos[0]+2):
+                for ny in range(cur_pos[1]-1, cur_pos[1]+2):
+                    if (nx, ny) == cur_pos or (nx, ny) in visited:
+                        continue
+
+                    d = ((dest[0] - nx)**2 + (dest[1] - ny)**2) ** 0.5
+                    if d < min_d:
+                        min_d = d
+                        next_pos = (nx, ny)
+            
+            if next_pos is not None:
+                cur_pos = next_pos
+                res.putpixel(cur_pos, (0, 255, 0))
+            else:
+                break
+
+            visited.add(cur_pos)
+    if display:
+        res.show()
+    return False
+
+def get_graph(regions: list[Region], img: Image) -> dict:
     dic = {}
+    ps = img.load()
 
     for idx, cur_r in enumerate(regions):
         neighbours = []
@@ -191,7 +259,8 @@ def get_graph(regions: list[Region]) -> dict:
                 continue
 
             if collide_bbox(cur_r, r2):
-                neighbours.append(idx2)
+                if regions_touch(cur_r, r2, ps, (img.width, img.height)):
+                    neighbours.append(idx2)
         dic[idx] = neighbours
     
     return dic
@@ -201,4 +270,4 @@ if __name__ == "__main__":
     regions = [Region(r) for r in get_regions_pixels(img, display=False)]
     
     display_regions(regions)
-    print(get_graph(regions))
+    print(get_graph(regions, img))
