@@ -1,9 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from graph import Graphe
-
-def display_graph(graphe:Graphe, figsize: tuple = (8, 8)) -> nx.Graph:
+def display_graph(graphe, figsize: tuple = (8, 8)):
     G = nx.Graph()
 
     for node in graphe:
@@ -48,3 +46,35 @@ def display_graph(graphe:Graphe, figsize: tuple = (8, 8)) -> nx.Graph:
     )
 
     plt.show()
+
+
+# ----------------------------------------------------
+# Loading Animations
+# ----------------------------------------------------
+
+def bar_animation(iterable, refresh: int = 50, size: int = 100, title:str = "Chargement", full_car: str = "█", empty_car: str = " ", get_idx: bool = False):
+    maxn = len(iterable)
+    r = 0
+
+    for idx, el in enumerate(iterable, start=1):
+        if get_idx:
+            yield idx - 1, el
+        else:
+            yield el
+        if r > refresh:
+            lim = size * idx / maxn
+            percent = lim / size * 100
+            print(full_car * int(lim) + empty_car * int(size - lim), f"{int(percent)}% - {title}", end="\r")
+            r = 0
+        r += 1
+    print("")
+
+if __name__ == "__main__":
+    for i in bar_animation(range(1000000)):
+        pass
+
+    for i in bar_animation(range(1000000), full_car="▰", empty_car="▱"):
+        pass
+
+    for i in bar_animation(range(1000000), full_car="■", empty_car="□"):
+        pass

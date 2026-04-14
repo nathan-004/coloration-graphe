@@ -1,5 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
+from utils import bar_animation
+
 font = ImageFont.load_default(32)
 
 from collections import deque
@@ -54,7 +56,7 @@ def get_outlines(img_path: str, seuil_distance: float = 150, display: bool = Tru
     pixels = img.load()
     result = Image.new("RGB", (img.width, img.height), (255, 255, 255))
 
-    for y in range(img.height):
+    for y in bar_animation(range(img.height), title="Détection contours"):
         for x in range(img.width):
             pixel = pixels[x, y]
 
@@ -91,7 +93,7 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
 
     n = 0
 
-    for y in range(img.height):
+    for y in bar_animation(range(img.height), title="Obtention des régions"):
         for x in range(img.width):
             if (x, y) in visited:
                 continue
@@ -252,7 +254,7 @@ def get_graph(regions: list[Region], img: Image) -> dict:
     dic = {}
     ps = img.load()
 
-    for idx, cur_r in enumerate(regions):
+    for idx, cur_r in bar_animation(regions, title="Création du graphe", refresh= 1,get_idx=True):
         neighbours = []
         for idx2, r2 in enumerate(regions):
             if idx == idx2:
