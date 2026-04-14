@@ -271,3 +271,5 @@ if __name__ == "__main__":
     
     display_regions(regions)
     print(get_graph(regions, img))
+
+    assert regions_touch(regions[0], regions[1], img.load(), (img.width, img.height))
