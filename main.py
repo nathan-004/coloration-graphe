@@ -11,12 +11,38 @@ def color_random(graph: Graphe):
         graph.colors[region] = color
         noeuds.remove(region)
 
-#result = Graphe.from_map_image("assets/imgs/regions_france.jpg")
+
+#colorisation aléatoire avec règles de colorisation
+def color_random_rules(graph: Graphe):
+    colors = []
+    noeuds = list(graph.keys())
+    while noeuds:
+        region = random.choice(noeuds)
+        for color in colors:
+            same = False
+            for voisin in graph[region]:
+                if color == graph.colors[voisin]:
+                    same = True
+                    break
+            if same == False:
+                graph.colors[region] = color
+                break
+        if graph.colors[region] is None:
+            color = random.random(), random.random(), random.random()
+            colors.append(color)
+            graph.colors[region] = color
+        noeuds.remove(region)
+
+
+
+
+
+
 
 graph = get_regions_france()
-graph.colors["Hauts-de-France"]= 1,1,0.7
 
+#color_random(graph)
+color_random_rules(graph)
 
-color_random(graph)
 display_graph(graph)
 
