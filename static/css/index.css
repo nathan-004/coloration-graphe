@@ -22,6 +22,19 @@
     transform: translate(-50%, -50%);
     width: 50vw;
     height: 50vh;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    font-family: "Bevan", serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 25px;
+
+    color: var(--secondary-color);
 }
 
 #heroSectionContent::before {
