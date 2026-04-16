@@ -11,7 +11,6 @@ def color_random(graph: Graphe):
         graph.colors[region] = color
         noeuds.remove(region)
 
-
 #colorisation aléatoire avec règles de colorisation
 def color_random_rules(graph: Graphe):
     colors = []
@@ -33,13 +32,8 @@ def color_random_rules(graph: Graphe):
             graph.colors[region] = color
         noeuds.remove(region)
 
-
-
-
-
-
-
-graph = get_regions_france()
+result = Graphe.from_map_image("assets/imgs/regions_france.jpg")
+graph = result.graphe #get_regions_france()
 
 #color_random(graph)
 color_random_rules(graph)

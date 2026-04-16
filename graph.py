@@ -75,14 +75,32 @@ class Graphe(dict):
     
     @staticmethod
     def from_map_image(img_path: str, display: bool = False) -> FromImageResult:
+        map_result = load_map(img_path)
+
+        if map_result is not None:
+            print(f"Sauvegarde trouvée pour {img_path}")
+
+            img = Image.open(map_result["img_path"])
+            return FromImageResult(
+                Graphe(
+                    map_result["graph"], {idx: (center[0], img.height - center[1]) for idx, center in enumerate(map_result["centers"])}
+                ),
+                img,
+                [Region(r) for r in get_regions_pixels(img, display=display)]
+            )
+
         img = get_outlines(img_path, display=display)
         regions = [Region(r) for r in get_regions_pixels(img, display=display)]
 
         if display:
             display_regions(regions)
 
+        graphe = get_graph(regions, img)
+
+        save_map(graphe, img, regions, img_path)
+
         return FromImageResult(
-            Graphe(get_graph(regions, img), positions= {idx: (r.center[0], img.height - r.center[1]) for idx, r in enumerate(regions)}),
+            Graphe(graphe, positions= {idx: (r.center[0], img.height - r.center[1]) for idx, r in enumerate(regions)}),
             img,
             regions
         )

@@ -1,4 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
+import hashlib
+import json
+
 
 from utils import bar_animation
 
@@ -266,6 +269,37 @@ def get_graph(regions: list[Region], img: Image) -> dict:
         dic[idx] = neighbours
     
     return dic
+
+def image_sha1(path: str) -> int:
+    img = Image.open(path).convert("RGB").resize((512, 512))
+    return hashlib.sha1(img.tobytes()).hexdigest()
+
+def save_map(graph: dict, img: Image, regions: list[Region], original_img_path: str):
+    img_signature = image_sha1(original_img_path)
+    centers = [region.center for region in regions]
+
+    img_path = f"saves/imgs/{img_signature}.jpg"
+    img.save(img_path)
+
+    formated = {
+        "graph": graph,
+        "img_path": img_path,
+        "centers": centers
+    }
+
+    with open(f"saves/{img_signature}.json", "w") as f: 
+        json.dump(formated, f)
+
+def load_map(img_path: str) -> dict | None:
+    img_signature = image_sha1(img_path)
+
+    try:
+        with open(f"saves/{img_signature}.json") as f:
+            res = json.load(f)
+            res["graph"] = {int(key): value for key, value in res["graph"].items()}
+            return res
+    except FileNotFoundError: 
+        return None
 
 if __name__ == "__main__":
     img = get_outlines("assets/imgs/regions_france.jpg", display=False)
