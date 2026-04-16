@@ -1,0 +1,1 @@
+[Flask rendering templates](https://flask.palletsprojects.com/en/stable/quickstart/#rendering-templates)
