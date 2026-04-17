@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, Response, jsonify
+from flask import Blueprint
 import os
 import time
 
@@ -8,6 +9,9 @@ from color import *
 
 app = Flask(__name__)
 
+imgs = Blueprint("imgs", __name__, static_url_path="/imgs", static_folder="saves/imgs")
+app.register_blueprint(imgs)
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -15,6 +19,10 @@ def home():
 @app.route("/maps")
 def maps():
     return render_template("maps.html")
+
+@app.route("/maps/<id>")
+def map(id):
+    return render_template("map.html", id=id)
 
 @app.route("/upload")
 def upload():
