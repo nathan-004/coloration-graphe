@@ -15,7 +15,7 @@ def maps():
     return render_template("maps.html")
 
 @app.route("/upload")
-def maps():
+def upload():
     return render_template("updload.html")
 
 # result = Graphe.from_map_image("assets/imgs/regions_france.jpg")

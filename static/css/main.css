@@ -7,6 +7,22 @@ body {
     background-color: var(--primary-color);
 }
 
-* {
-    z-index: 0;
+header {
+    display: flex;
+    width: 100vw;
+}
+
+.logo {
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logo:hover {
+    transform: translate(-4px, -4px);
+    filter:
+        drop-shadow(4px 4px 0 color-mix(in srgb, var(--primary-color) 80%, var(--secondary-color)))
+        drop-shadow(8px 8px 0 color-mix(in srgb, var(--primary-color) 60%, var(--secondary-color)))
+        drop-shadow(12px 12px 0 color-mix(in srgb, var(--primary-color) 40%, var(--secondary-color)))
+        drop-shadow(16px 16px 0 color-mix(in srgb, var(--primary-color) 20%, var(--secondary-color)))
+        drop-shadow(20px 20px 0 var(--secondary-color));
+    cursor: pointer;
 }
