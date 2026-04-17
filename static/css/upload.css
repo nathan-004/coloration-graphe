@@ -1,0 +1,112 @@
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+}
+
+h1 {
+    font-family: "Bevan", serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 50px;
+    color: var(--secondary-color);
+}
+
+.form-upload {
+    position: relative;
+    width: 80%;
+    max-width: 700px;
+    margin: auto;
+    margin-top: 8vh;
+    
+    padding: 3rem 2rem;
+    
+    background: var(--secondary-color);
+    
+    border-radius: 20px;
+    
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    
+    box-shadow: 
+        0 20px 40px rgba(0,0,0,0.2),
+        0 5px 15px rgba(0,0,0,0.1);
+    
+    backdrop-filter: blur(10px);
+    
+    transition: transform 0.3s ease;
+}
+
+/* Input file */
+.form-upload input[type="file"] {
+    padding: 1rem;
+    background: rgba(255,255,255,0.15);
+    border: 2px dashed rgba(255,255,255,0.4);
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-upload input[type="file"]:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: white;
+}
+
+/* Button */
+.form-upload button {
+    padding: 1rem;
+    
+    background: white;
+    color: var(--primary-color);
+    
+    border: none;
+    border-radius: 12px;
+    
+    font-size: 1.1rem;
+    font-weight: 600;
+    
+    cursor: pointer;
+    
+    transition: all 0.3s ease;
+}
+
+.form-upload button:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+    
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.progress-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 80%, rgba(0, 0, 0, 0));
+}
+
+#uploadProgress {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    width: 50vw;
+}
+
+#progressContent {
+    position: absolute;
+    top: 45vh;
+    left: 50vw;
+    transform: translate(-50%, -50%);
+    font-family: "Bevan", serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 25px;
+    color: var(--secondary-color);
+}

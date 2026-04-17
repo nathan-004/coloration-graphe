@@ -91,8 +91,7 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
     pixels = img.load()
     visited = set()
     regions = []
-    if display:
-        res = Image.new("RGB", (img.width, img.height))
+    res = Image.new("RGB", (img.width, img.height))
 
     n = 0
 
@@ -134,13 +133,12 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
             
             if len(region_pixels) > min_pixels_region:
                 regions.append(region_pixels)
-                if display:
-                    for x, y in region_pixels:
-                        res.putpixel((x, y), (255, 255, 255))
+                for x, y in region_pixels:
+                    res.putpixel((x, y), (255, 255, 255))
 
     if display:
         res.show()
-    return regions
+    return regions, res
 
 def display_regions(regions: list[Region], width: int = None, height: int = None) -> Image:
     if width is None or height is None:
@@ -303,7 +301,8 @@ def load_map(img_path: str) -> dict | None:
 
 if __name__ == "__main__":
     img = get_outlines("assets/imgs/regions_france.jpg", display=False)
-    regions = [Region(r) for r in get_regions_pixels(img, display=False)]
+    regions_pixels, img_regions = get_regions_pixels(img, display=False)
+    regions = [Region(r) for r in regions_pixels]
     
     display_regions(regions)
     print(get_graph(regions, img))

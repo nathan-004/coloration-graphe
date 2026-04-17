@@ -7,6 +7,7 @@ class FromImageResult(NamedTuple):
     graphe: dict
     img: Image
     regions: list[Region]
+    map_id: str
 
 class Graphe(dict):
     """Dictionnaire de dictionnaire sous la forme {'A': 5 } contenant les voisins"""
@@ -81,28 +82,32 @@ class Graphe(dict):
             print(f"Sauvegarde trouvée pour {img_path}")
 
             img = Image.open(map_result["img_path"])
+            regions_pixels, regions_img = get_regions_pixels(img, display=display)
             return FromImageResult(
                 Graphe(
                     map_result["graph"], {idx: (center[0], img.height - center[1]) for idx, center in enumerate(map_result["centers"])}
                 ),
-                img,
-                [Region(r) for r in get_regions_pixels(img, display=display)]
+                regions_img,
+                [Region(r) for r in regions_pixels],
+                image_sha1(img_path)
             )
 
         img = get_outlines(img_path, display=display)
-        regions = [Region(r) for r in get_regions_pixels(img, display=display)]
+        regions_pixels, regions_img = get_regions_pixels(img, display=display)
+        regions = [Region(r) for r in regions_pixels]
 
         if display:
             display_regions(regions)
 
         graphe = get_graph(regions, img)
 
-        save_map(graphe, img, regions, img_path)
+        save_map(graphe, regions_img, regions, img_path)
 
         return FromImageResult(
             Graphe(graphe, positions= {idx: (r.center[0], img.height - r.center[1]) for idx, r in enumerate(regions)}),
-            img,
-            regions
+            regions_img,
+            regions,
+            image_sha1(img_path)
         )
     
 def get_regions_france() -> Graphe:

@@ -1,6 +1,11 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
+progress_data = {
+    "percent": 0,
+    "message": ""
+}
+
 def display_graph(graphe, figsize: tuple = (8, 8)):
     G = nx.Graph()
 
@@ -52,7 +57,7 @@ def display_graph(graphe, figsize: tuple = (8, 8)):
 # Loading Animations
 # ----------------------------------------------------
 
-def bar_animation(iterable, refresh: int = 50, size: int = 100, title:str = "Chargement", full_car: str = "█", empty_car: str = " ", get_idx: bool = False):
+def bar_animation(iterable, refresh: int = 1, size: int = 100, title:str = "Chargement", full_car: str = "█", empty_car: str = " ", get_idx: bool = False):
     maxn = len(iterable)
     r = 0
 
@@ -66,6 +71,8 @@ def bar_animation(iterable, refresh: int = 50, size: int = 100, title:str = "Cha
             percent = lim / size * 100
             print(full_car * int(lim) + empty_car * int(size - lim), f"{int(percent)}% - {title}", end="\r")
             r = 0
+            progress_data["percent"] = int(percent)
+            progress_data["message"] = title
         r += 1
     print("")
 
