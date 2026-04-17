@@ -10,6 +10,14 @@ app = Flask(__name__)
 def home():
     return render_template("index.html")
 
+@app.route("/maps")
+def maps():
+    return render_template("maps.html")
+
+@app.route("/upload")
+def maps():
+    return render_template("updload.html")
+
 # result = Graphe.from_map_image("assets/imgs/regions_france.jpg")
 # graph = result.graphe #get_regions_france()
 

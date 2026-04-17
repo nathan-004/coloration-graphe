@@ -55,9 +55,12 @@
     background-color: var(--secondary-color);
     backdrop-filter: blur(30px);
     border-color: var(--primary-color);
-    transition: all 0.5s;
+    color: var(--primary-color);
+    transition: opacity 0.5s;
+    transition: border-radius 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 #heroOptions button:hover {
-    opacity: 0.8;
+    opacity: 0.95;
+    border-radius: 15px 15px;
 }

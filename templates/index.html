@@ -24,8 +24,14 @@
             <div id="heroSectionContent">
                 <h1 id="heroTitle">Algorithmes de coloration de graphe</h1>
                 <div id="heroOptions">
-                    <button type="button">Voir cartes déjà existantes</button>
-                    <button type="button">Ajouter une carte</button>
+                    <button type="button" onclick="redirect('/maps')">Voir cartes déjà existantes</button>
+                    <button type="button" onclick="redirect('/upload')">Ajouter une carte</button>
+
+                    <script>
+                        function redirect(url) {
+                            window.location.href = url;
+                        }
+                    </script>
                 </div>
             </div>
         </div>
