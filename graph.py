@@ -110,6 +110,24 @@ class Graphe(dict):
             image_sha1(img_path)
         )
     
+    @staticmethod
+    def from_map_id(id:str, display: bool = False) -> FromImageResult:
+        map_result = load_map(img_signature=id)
+
+        if map_result is not None:
+            print(f"Sauvegarde trouvée pour {id}")
+
+            img = Image.open(map_result["img_path"])
+            regions_pixels, regions_img = get_regions_pixels(img, display=display)
+            return FromImageResult(
+                Graphe(
+                    map_result["graph"], {idx: (center[0], img.height - center[1]) for idx, center in enumerate(map_result["centers"])}
+                ),
+                regions_img,
+                [Region(r) for r in regions_pixels],
+                id
+            )
+    
 def get_regions_france() -> Graphe:
     noms_regions = [
         "Hauts-de-France",

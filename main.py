@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, Response, jsonify
-from flask import Blueprint
+from flask import Blueprint, abort
 import os
 import time
+import json
 
 from graph import Graphe, get_regions_france
 from utils import display_graph, progress_data
@@ -22,7 +23,12 @@ def maps():
 
 @app.route("/maps/<id>")
 def map(id):
-    return render_template("map.html", id=id)
+    path = f"saves/{id}.json"
+    if not os.path.isfile(path):
+        abort(404)
+    with open(path) as f:
+        centers = json.load(f)["centers"]
+    return render_template("map.html", id=id, centers=centers)
 
 @app.route("/upload")
 def upload():
@@ -60,6 +66,28 @@ def progress():
             time.sleep(0.1)
 
     return Response(generate(), mimetype="text/event-stream")
+
+@app.route("/color", methods=["POST"])
+def color():
+    id = request.json["id"]
+    algo = request.json["algo"]
+    print(id, algo)
+
+    functions = {
+        "random": color_random,
+        "random_rules": color_random_rules,
+        "glouton": color_glouton
+    }
+
+    if algo in functions:
+        return jsonify({
+            "status": "success",
+            "data": functions[algo](Graphe.from_map_id(id).graphe),
+        })
+    else:
+        return jsonify({
+            "status": "error"
+        }), 404
 
 # result = Graphe.from_map_image("assets/imgs/regions_france.jpg")
 # graph = result.graphe #get_regions_france()

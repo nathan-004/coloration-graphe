@@ -288,8 +288,9 @@ def save_map(graph: dict, img: Image, regions: list[Region], original_img_path: 
     with open(f"saves/{img_signature}.json", "w") as f: 
         json.dump(formated, f)
 
-def load_map(img_path: str) -> dict | None:
-    img_signature = image_sha1(img_path)
+def load_map(img_path: str = "", img_signature: str = None) -> dict | None:
+    if img_signature is None:
+        img_signature = image_sha1(img_path)
 
     try:
         with open(f"saves/{img_signature}.json") as f:

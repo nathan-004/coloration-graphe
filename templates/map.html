@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartes disponibles</title>
+    <title>Carte {{ id }}</title>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
     <script>
         const ID = "{{ id }}";
+        const CENTERS = {{ centers | tojson }};
     </script>
 </head>
 <body>
@@ -66,9 +67,26 @@
         </a>
     </header>
     <main>
+        <fieldset>
+            <div class="inputs-wrapper">
+                <div>
+                    <input type="radio" id="algo1" name="algo" value="random">
+                    <label for="algo1">Algorithme purement aléatoire</label>
+                </div>  
+                <div>
+                    <input type="radio" id="algo2" name="algo" value="random_rules">
+                    <label for="algo2">Algorithme aléatoire respectant les règles de coloration</label>
+                </div>
+                <div>
+                    <input type="radio" id="algo3" name="algo" value="glouton">
+                    <label for="algo3">Algorithme glouton</label>
+                </div>       
+            </div>
+        </fieldset>
         <div class="map-wrapper">
             <img id="map" src="/imgs/{{ id }}.jpg"/>
         </div>
     </main>
 </body>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
 </html>
