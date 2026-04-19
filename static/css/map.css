@@ -10,7 +10,7 @@ main {
     width: fit-content;
 }
 
-#map {
+#map, canvas {
     max-height: 60vh;
 }
 
