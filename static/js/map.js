@@ -21,7 +21,7 @@ function color(centers, colors, ctx, canvas) {
     }
 
     function isBlack(i) {
-        return pix[i] == 0 && pix[i+1] == 0 && pix[i+2] == 0;
+        return pix[i] <= 100 && pix[i+1] <= 100 && pix[i+2] <= 100;
     }
 	console.log(isBlack(0), isBlack(getIndex(657, 152)));
     centers.forEach((center, idx) => {
