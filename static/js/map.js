@@ -21,27 +21,29 @@ function color(centers, colors, ctx, canvas) {
     }
 
     function isBlack(i) {
-        return pix[i] === 0 && pix[i+1] === 0 && pix[i+2] === 0;
+        return pix[i] == 0 && pix[i+1] == 0 && pix[i+2] == 0;
     }
-
+	console.log(isBlack(0), isBlack(getIndex(657, 152)));
     centers.forEach((center, idx) => {
         if (!(idx in colors)) return;
 
         const visited = new Set();
         let stack = [center];
         let color = colors[idx];
-
+		
         while (stack.length > 0) {
             let pos = stack.pop();
+			pos = [Math.round(pos[0]), Math.round(pos[1])];
             let key = `${pos[0]},${pos[1]}`;
 
             if (visited.has(key)) continue;
             visited.add(key);
 
             let i = getIndex(pos[0], pos[1]);
+			
+			if (isBlack(i)) continue;
 
             // Colorier
-            console.log(pos);
             pix[i] = color[0];
             pix[i+1] = color[1];
             pix[i+2] = color[2];
@@ -70,6 +72,7 @@ function color(centers, colors, ctx, canvas) {
                 }
             });
         }
+		// console.log(visited);
     });
 
     console.log(canvas.width, canvas.height)
