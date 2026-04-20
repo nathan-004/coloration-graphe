@@ -87,6 +87,10 @@
             <img id="map" src="/imgs/{{ id }}.jpg"/>
             <canvas id="canvas"></canvas>
         </div>
+		<div class="controls-container">
+			<button class="control-button" onclick="updateStep(-1);">Reculer</button>
+			<button class="control-button" onclick="updateStep(1);">Avancer</button>
+		</div>
     </main>
 </body>
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>

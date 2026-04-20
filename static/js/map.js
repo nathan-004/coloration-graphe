@@ -9,8 +9,8 @@ img.onload = () => {
     ctx.drawImage(img, 0, 0)
 }
 
+let steps = 0;
 let colors = [];
-let curColors = {};
 
 function color(centers, colors, ctx, canvas) {
     const imgd = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -83,6 +83,8 @@ async function handleChangeRadio (event) {
     const algo = event.target.value;
 
     colors = await getColors(ID, algo);
+	steps = 0;
+	update();
 }
 
 async function getColors(id, algo) {
@@ -109,6 +111,52 @@ async function getColors(id, algo) {
 document.querySelectorAll("input[name='algo']").forEach((input) => {
     input.addEventListener("change", handleChangeRadio);
 });
+
+function getCurrentColors(steps) {
+	let currentColors = {};
+	
+	for (let i = 0; i < steps; i++) {
+		const s = colors[i];
+		Object.keys(s).forEach((k) => {
+			currentColors[k] = [s[k][0] * 255, s[k][1] * 255, s[k][2] * 255];
+		});
+	}
+	
+	return currentColors;
+}
+
+function update() {
+	if (colors.length == 0) {
+		window.alert("En attente de réponse du serveur.");
+		return
+	}
+	
+	color(CENTERS, getCurrentColors(steps), ctx, canvas);
+}
+
+function max(a, b) {
+	if (a > b) {
+		return a
+	}
+	else {
+		return b
+	}
+}
+
+function min(a, b) {
+	if (a < b) {
+		return a
+	}
+	else {
+		return b
+	}
+}
+
+function updateStep(variation) {
+	steps += variation;
+	steps = max(min(steps, colors.length), 0)
+	update();
+}
 
 async function initColors() {
     colors = await getColors(ID, "random");
