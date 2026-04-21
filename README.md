@@ -4,4 +4,5 @@
 
 - [ ] Optimisation
   - [X] Enlever chargement régions côté serveur
+  - [ ] Créer cache pixels région (client)
 - [ ] Algorithmes de coloration
