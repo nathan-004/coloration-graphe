@@ -14,7 +14,7 @@ def color_random(graph: Graphe):
         graph.colors[region] = color
         noeuds.remove(region)
         result.append({region: color})
-    
+
     return result
 
 #colorisation aléatoire avec règles de colorisation
@@ -72,12 +72,12 @@ def color_glouton(graph: Graphe):
                 colors.append(color)
                 graph.colors[region] = color
                 result.append({region : color})
-            
+
             noeuds.remove(region)
     return result
 
 if __name__ == "__main__":
     g = Graphe.from_map_image("assets/imgs/regions_france.jpg")
 
-    color_glouton(g)
-    display_graph(g)
+    color_glouton(g.graphe)
+    display_graph(g.graphe)

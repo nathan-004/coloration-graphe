@@ -5,7 +5,7 @@ import json
 
 from utils import bar_animation
 
-font = ImageFont.load_default(32)
+font = ImageFont.load_default()
 
 from collections import deque
 from typing import NamedTuple
@@ -17,26 +17,44 @@ class Bbox(NamedTuple):
     maxy: int
 
 class Region(dict):
-    def __init__(self, pixels: list[tuple[int, int]]):
+    def __init__(self, pixels: list):
+        """
+        Parameters
+        ----------
+        pixels: list[tuple[int, int]]
+        """
+
         super().__init__({
             "pixels": pixels,
             "bbox": self._get_bbox(pixels)
         })
-    
-    def _get_bbox(self, pixels: list[tuple[int, int]]) -> Bbox:
+
+    def _get_bbox(self, pixels: list) -> Bbox:
+        """
+        Parameters
+        ----------
+        pixels: list[tuple[int, int]]
+        """
+
         minx, maxx = min(pixels, key = lambda x : x[0])[0], max(pixels, key = lambda x : x[0])[0]
         miny, maxy = min(pixels, key = lambda x : x[1])[1], max(pixels, key = lambda x : x[1])[1]
 
         return Bbox(minx, miny, maxx, maxy)
-    
+
     @property
-    def pixels(self) -> list[tuple[int, int]]:
+    def pixels(self) -> list:
+        """
+        Returns
+        -------
+        Liste de positions
+            list[tuple[int, int]]
+        """
         return self["pixels"]
-    
+
     @property
     def bbox(self) -> Bbox:
         return self["bbox"]
-    
+
     @property
     def center(self):
         minx, miny, maxx, maxy = self.bbox
@@ -65,7 +83,7 @@ def get_outlines(img_path: str, seuil_distance: float = 150, display: bool = Tru
 
             if pixel[3] == 0:
                 result.putpixel((x, y), (0, 0, 0))
-            
+
             neighbours = []
 
             for var_x in range(-1, 2):
@@ -84,7 +102,7 @@ def get_outlines(img_path: str, seuil_distance: float = 150, display: bool = Tru
 
     if display:
         result.show()
-    
+
     return result
 
 def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regions: bool = False, display: bool = True) -> Image:
@@ -104,7 +122,7 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
                 continue
 
             stack = deque([(x, y)])
-            region_pixels = [] 
+            region_pixels = []
 
             cut_region = False
 
@@ -116,7 +134,7 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
 
                 if pixels[cur_x, cur_y] != (255, 255, 255):
                     continue
-                
+
                 region_pixels.append((cur_x, cur_y))
                 visited.add((cur_x, cur_y))
 
@@ -127,10 +145,13 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
                         stack.append((nx, ny))
                     else:
                         cut_region = True
-            
+
             if cut_region and not allow_cut_regions:
+                if len(region_pixels) > min_pixels_region:
+                    for x, y in region_pixels:
+                        res.putpixel((x, y), (133, 133, 255))
                 continue
-            
+
             if len(region_pixels) > min_pixels_region:
                 regions.append(region_pixels)
                 for x, y in region_pixels:
@@ -140,7 +161,7 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
         res.show()
     return regions, res
 
-def display_regions(regions: list[Region], width: int = None, height: int = None) -> Image:
+def display_regions(regions: list, width: int = None, height: int = None) -> Image:
     if width is None or height is None:
         max_x = max([region.bbox.maxx for region in regions]) + 1 if regions else 0
         max_y = max([region.bbox.maxy for region in regions]) + 1 if regions else 0
@@ -148,13 +169,13 @@ def display_regions(regions: list[Region], width: int = None, height: int = None
             width = max_x
         if height is None:
             height = max_y
-    
+
     result = Image.new("RGB", (width, height), (0, 0, 0))
-    
+
     for region in regions:
         for x, y in region.pixels:
             result.putpixel((x, y), (255, 255, 255))
-    
+
     pixels = result.load()
     for region in regions:
         bbox = region.bbox
@@ -170,7 +191,7 @@ def display_regions(regions: list[Region], width: int = None, height: int = None
 
         for y in range(bbox.miny, bbox.maxy + 1):
             pixels[bbox.maxx, y] = (255, 0, 0)
-    
+
     # Ajouter les indices des régions
     draw = ImageDraw.Draw(result)
     for idx, region in enumerate(regions):
@@ -180,9 +201,9 @@ def display_regions(regions: list[Region], width: int = None, height: int = None
         center_y = (bbox.miny + bbox.maxy) // 2
 
         draw.text((center_x, center_y), str(idx), fill=(0, 0, 0), font=font)
-    
+
     result.show()
-    
+
     return result
 
 def collide_bbox(r1: Region, r2: Region) -> bool:
@@ -197,7 +218,7 @@ def regions_touch(r1: Region, r2: Region, pixels, img_size: tuple, display: bool
     res = Image.new("RGB", img_size)
     outline_pixels = [
         (x, y) for x, y in r1.pixels
-        if any([pixels[x+var_x, y+var_y] != (255, 255, 255) for var_x in range(-1, 2) for var_y in range(-1, 2) 
+        if any([pixels[x+var_x, y+var_y] != (255, 255, 255) for var_x in range(-1, 2) for var_y in range(-1, 2)
                 if 0 <= x + var_x < img_size[0] and 0 <= y + var_y < img_size[1]
             ])
     ]
@@ -223,7 +244,7 @@ def regions_touch(r1: Region, r2: Region, pixels, img_size: tuple, display: bool
                 if display:
                     res.show()
                 return True
-            
+
             if pixels[cur_pos] == (255, 255, 255) and not cur_pos in pixs_r1: # Pixel blanc pas dans r1 ou r2
                 break
 
@@ -239,7 +260,7 @@ def regions_touch(r1: Region, r2: Region, pixels, img_size: tuple, display: bool
                     if d < min_d:
                         min_d = d
                         next_pos = (nx, ny)
-            
+
             if next_pos is not None:
                 cur_pos = next_pos
                 res.putpixel(cur_pos, (0, 255, 0))
@@ -251,7 +272,7 @@ def regions_touch(r1: Region, r2: Region, pixels, img_size: tuple, display: bool
         res.show()
     return False
 
-def get_graph(regions: list[Region], img: Image) -> dict:
+def get_graph(regions: list, img: Image) -> dict:
     dic = {}
     ps = img.load()
 
@@ -265,14 +286,14 @@ def get_graph(regions: list[Region], img: Image) -> dict:
                 if regions_touch(cur_r, r2, ps, (img.width, img.height)):
                     neighbours.append(idx2)
         dic[idx] = neighbours
-    
+
     return dic
 
 def image_sha1(path: str) -> int:
     img = Image.open(path).convert("RGB").resize((512, 512))
     return hashlib.sha1(img.tobytes()).hexdigest()
 
-def save_map(graph: dict, img: Image, regions: list[Region], original_img_path: str):
+def save_map(graph: dict, img: Image, regions: list, original_img_path: str):
     img_signature = image_sha1(original_img_path)
     centers = [region.center for region in regions]
 
@@ -285,10 +306,10 @@ def save_map(graph: dict, img: Image, regions: list[Region], original_img_path: 
         "centers": centers
     }
 
-    with open(f"saves/{img_signature}.json", "w") as f: 
+    with open(f"saves/{img_signature}.json", "w") as f:
         json.dump(formated, f)
 
-def load_map(img_path: str = "", img_signature: str = None) -> dict | None:
+def load_map(img_path: str = "", img_signature: str = None) -> dict:
     if img_signature is None:
         img_signature = image_sha1(img_path)
 
@@ -297,14 +318,14 @@ def load_map(img_path: str = "", img_signature: str = None) -> dict | None:
             res = json.load(f)
             res["graph"] = {int(key): value for key, value in res["graph"].items()}
             return res
-    except FileNotFoundError: 
+    except FileNotFoundError:
         return None
 
 if __name__ == "__main__":
     img = get_outlines("assets/imgs/regions_france.jpg", display=False)
     regions_pixels, img_regions = get_regions_pixels(img, display=False)
     regions = [Region(r) for r in regions_pixels]
-    
+
     display_regions(regions)
     print(get_graph(regions, img))
 
