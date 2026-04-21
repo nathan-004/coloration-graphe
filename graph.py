@@ -5,9 +5,12 @@ from map import *
 
 class FromImageResult(NamedTuple):
     graphe: dict
-    img: Image
-    regions: list[Region]
+    img: type(Image)
+    regions: list # list[Region]
     map_id: str
+
+class FromIdResult(NamedTuple):
+    graphe: dict
 
 class Graphe(dict):
     """Dictionnaire de dictionnaire sous la forme {'A': 5 } contenant les voisins"""
@@ -15,7 +18,7 @@ class Graphe(dict):
         if self._is_valid_iterable(iterable):
             for key, val in iterable.items():
                 self[key] = val
-                
+
         self.colors = defaultdict(lambda : None)
         self.positions = defaultdict(lambda : None)
         self.positions.update(positions)
@@ -34,13 +37,19 @@ class Graphe(dict):
         if not key in self:
             self[key] = {}
         return super().__getitem__(key)
-    
-    def __setitem__(self, key, value: dict | list):
+
+    def __setitem__(self, key, value):
+        """
+        Parameters
+        ----------
+        key
+        value: dict | list
+        """
         if type(value) is list:
             value = {k : 1 for k in value}
         elif type(value) is not dict:
             raise TypeError(f"{type(value)} n'est pas un type valide pour la création d'un noeud")
-        
+
         return super().__setitem__(key, value)
 
     #---------------------------------------------------------
@@ -73,7 +82,7 @@ class Graphe(dict):
                     else:
                         g.add_arrete(a, b, v)
         return g
-    
+
     @staticmethod
     def from_map_image(img_path: str, display: bool = False) -> FromImageResult:
         map_result = load_map(img_path)
@@ -109,25 +118,20 @@ class Graphe(dict):
             regions,
             image_sha1(img_path)
         )
-    
+
     @staticmethod
-    def from_map_id(id:str, display: bool = False) -> FromImageResult:
+    def from_map_id(id:str, display: bool = False) -> FromIdResult:
         map_result = load_map(img_signature=id)
 
         if map_result is not None:
             print(f"Sauvegarde trouvée pour {id}")
 
-            img = Image.open(map_result["img_path"])
-            regions_pixels, regions_img = get_regions_pixels(img, display=display)
-            return FromImageResult(
+            return FromIdResult(
                 Graphe(
-                    map_result["graph"], {idx: (center[0], img.height - center[1]) for idx, center in enumerate(map_result["centers"])}
-                ),
-                regions_img,
-                [Region(r) for r in regions_pixels],
-                id
+                    map_result["graph"], #{idx: (center[0], img.height - center[1]) for idx, center in enumerate(map_result["centers"])}
+                )
             )
-    
+
 def get_regions_france() -> Graphe:
     noms_regions = [
         "Hauts-de-France",
