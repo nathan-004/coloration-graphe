@@ -3,5 +3,5 @@
 ### To Do
 
 - [ ] Optimisation
-  - [ ] Enlever chargement régions côté serveur
+  - [X] Enlever chargement régions côté serveur
 - [ ] Algorithmes de coloration
