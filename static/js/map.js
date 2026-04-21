@@ -11,6 +11,7 @@ img.onload = () => {
 
 let steps = 0;
 let colors = [];
+let regions = {};
 
 function color(centers, colors, ctx, canvas) {
     const imgd = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -24,16 +25,38 @@ function color(centers, colors, ctx, canvas) {
         return pix[i] <= 100 && pix[i+1] <= 100 && pix[i+2] <= 100;
     }
 	console.log(isBlack(0), isBlack(getIndex(657, 152)));
+	
+	let calcStart = new Date();
+	
     centers.forEach((center, idx) => {
-        if (!(idx in colors)) return;
+        if (!(idx in colors)) return
+		let color = colors[idx];
+		
+		if (idx in regions) {
+			let vals = regions[idx];
+			
+			vals.forEach((pos) => {
+				let i = getIndex(pos[0], pos[1]);
+				
+				pix[i] = color[0];
+				pix[i+1] = color[1];
+				pix[i+2] = color[2];
+				pix[i+3] = 255;
+			});
+			
+			ctx.putImageData(imgd, 0, 0);
+			
+			return
+		}
 
         const visited = new Set();
         let stack = [center];
-        let color = colors[idx];
+		let curRegion = [];
 		
         while (stack.length > 0) {
             let pos = stack.pop();
 			pos = [Math.round(pos[0]), Math.round(pos[1])];
+			curRegion.push(pos);
             let key = `${pos[0]},${pos[1]}`;
 
             if (visited.has(key)) continue;
@@ -72,11 +95,20 @@ function color(centers, colors, ctx, canvas) {
                 }
             });
         }
+		regions[idx] = curRegion;
 		// console.log(visited);
     });
+	
+	let calcEnd = new Date();
+	
+	console.log(`Durée calculs : ${calcEnd.getTime() - calcStart.getTime()}ms`);
 
     console.log(canvas.width, canvas.height)
+	
+	let colorStart = new Date();
     ctx.putImageData(imgd, 0, 0);
+	let colorEnd = new Date();
+	console.log(`Durée coloriage : ${colorEnd.getTime() - colorStart.getTime()}ms`);
 }
 
 async function handleChangeRadio (event) {
@@ -120,6 +152,12 @@ function getCurrentColors(steps) {
 		Object.keys(s).forEach((k) => {
 			currentColors[k] = [s[k][0] * 255, s[k][1] * 255, s[k][2] * 255];
 		});
+	}
+	
+	for (let i = 0; i < colors.length; i++) {
+		if (!(i in currentColors)) {
+			currentColors[i] = [255, 255, 255];
+		}
 	}
 	
 	return currentColors;
