@@ -75,9 +75,31 @@ def color_glouton(graph: Graphe):
 
     return result
 
+def color_welsh_powell(graph: Graphe):
+    result = []
+    nodes = sorted(list(graph.keys()), key = lambda x: len(graph[x]), reverse = True)
+    color = (1, 0, 0)
+    idx = 0
+
+    while nodes:
+        n = nodes[idx]
+        if not(any([graph.colors[v] == color for v in graph[n]])):
+            graph.colors[n] = color
+            result.append({n: color})
+            nodes.pop(idx)
+        elif idx >= len(nodes) - 1:
+            idx = 0
+            color = (random.random(), random.random(), random.random())
+        else:
+            idx += 1
+
+        if idx >= len(nodes):
+            idx = 0
+
+    return result
 
 if __name__ == "__main__":
     g = Graphe.from_map_image("assets/imgs/regions_france.jpg")
 
-    color_glouton(g.graphe)
+    color_welsh_powell(g.graphe)
     display_graph(g.graphe)
