@@ -98,8 +98,40 @@ def color_welsh_powell(graph: Graphe):
 
     return result
 
+def color_dsatur(g: Graphe):
+    def dsat(n):
+        return len(set([
+            g.colors[v] for v in g[n] if g.colors[v] is not None
+        ]))
+
+    nodes = sorted(list(g.keys()), key = lambda x: len(g[x]), reverse = True)
+    colors = [(1, 0, 0)]
+
+    if len(nodes) == 0:
+        return
+    
+    f = nodes.pop(0)
+    g.colors[f] = colors[0]
+    result = [{f: colors[0]},]
+
+    while nodes:
+        n = max(nodes, key= lambda x : (dsat(x), len(g[x])))
+
+        for col in colors:
+            if all([col != g.colors[v] for v in g[n] if g.colors[v] is not None]):
+                g.colors[n] = col
+                break
+        else:
+            colors.append((random.random(), random.random(), random.random()))
+            g.colors[n] = colors[-1]
+        
+        result.append({n, g.colors[n]})
+        nodes.remove(n)
+    
+    return result
+
 if __name__ == "__main__":
     g = Graphe.from_map_image("assets/imgs/regions_france.jpg")
 
-    color_welsh_powell(g.graphe)
+    color_dsatur(g.graphe)
     display_graph(g.graphe)
