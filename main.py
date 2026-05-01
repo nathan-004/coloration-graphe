@@ -77,7 +77,8 @@ def color():
         "random": color_random,
         "random_rules": color_random_rules,
         "glouton": color_glouton,
-        "welsh_powell": color_welsh_powell
+        "welsh_powell": color_welsh_powell,
+        "dsatur": color_dsatur
     }
 
     if algo in functions:

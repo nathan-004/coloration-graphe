@@ -125,7 +125,7 @@ def color_dsatur(g: Graphe):
             colors.append((random.random(), random.random(), random.random()))
             g.colors[n] = colors[-1]
         
-        result.append({n, g.colors[n]})
+        result.append({n: g.colors[n]})
         nodes.remove(n)
     
     return result
