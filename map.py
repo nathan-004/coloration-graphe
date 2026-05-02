@@ -71,10 +71,33 @@ def distance(p1: tuple, p2: tuple) -> float:
 
     return (dr**2 + dg**2 + db**2)**0.5
 
-def get_outlines(img_path: str, seuil_distance: float = 150, display: bool = True) -> Image:
+def get_thresold(pixels: Image, w, h):
+    diffs = []
+
+    for y in range(0, h, 5):
+        for x in range(0, w, 5):
+
+            c = pixels[x, y]
+
+            for dx, dy in [(1,0), (0,1)]:
+                nx, ny = x+dx, y+dy
+
+                if nx < w and ny < h:
+                    c2 = pixels[nx, ny]
+                    d = distance(c, c2)
+                    if d > 1:
+                        diffs.append(d)
+
+    diffs.sort()
+    return sum(diffs)/len(diffs)
+
+def get_outlines(img_path: str, seuil_distance: float = None, display: bool = True) -> Image:
     """Renvoie une image noir et blanc (noir pour contour)"""
     img = Image.open(img_path).convert("RGBA")
     pixels = img.load()
+
+    if seuil_distance is None:
+        seuil_distance = get_thresold(pixels, *img.size)
     result = Image.new("RGB", (img.width, img.height), (255, 255, 255))
 
     for y in bar_animation(range(img.height), title="Détection contours"):
@@ -153,6 +176,14 @@ def get_regions_pixels(img: Image, min_pixels_region: int = 150, allow_cut_regio
                 continue
 
             if len(region_pixels) > min_pixels_region:
+                r = Region(region_pixels)
+                area = len(region_pixels)
+                width = r.bbox.maxx - r.bbox.minx
+                height = r.bbox.maxy - r.bbox.miny
+
+                if min(width, height) < 3 or area / (width * height) < 0.2:
+                    continue
+
                 regions.append(region_pixels)
                 for x, y in region_pixels:
                     res.putpixel((x, y), (255, 255, 255))
@@ -322,8 +353,8 @@ def load_map(img_path: str = "", img_signature: str = None) -> dict:
         return None
 
 if __name__ == "__main__":
-    img = get_outlines("assets/imgs/regions_france.jpg", display=False)
-    regions_pixels, img_regions = get_regions_pixels(img, display=False)
+    img = get_outlines("assets/imgs/regions_france.jpg", display=True)
+    regions_pixels, img_regions = get_regions_pixels(img, display=True)
     regions = [Region(r) for r in regions_pixels]
 
     display_regions(regions)
