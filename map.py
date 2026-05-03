@@ -74,8 +74,8 @@ def distance(p1: tuple, p2: tuple) -> float:
 def get_thresold(pixels: Image, w, h):
     diffs = []
 
-    for y in range(0, h, 5):
-        for x in range(0, w, 5):
+    for y in range(h):
+        for x in range(w):
 
             c = pixels[x, y]
 
@@ -85,10 +85,11 @@ def get_thresold(pixels: Image, w, h):
                 if nx < w and ny < h:
                     c2 = pixels[nx, ny]
                     d = distance(c, c2)
-                    if d > 1:
+                    if 1 < d < 400:
                         diffs.append(d)
 
     diffs.sort()
+    print(diffs[int(len(diffs) * 0.9)], sum(diffs)/len(diffs))
     return sum(diffs)/len(diffs)
 
 def get_outlines(img_path: str, seuil_distance: float = None, display: bool = True) -> Image:
@@ -120,8 +121,9 @@ def get_outlines(img_path: str, seuil_distance: float = None, display: bool = Tr
                         if neighbour[3] == 255:
                             neighbours.append(neighbour)
 
-            if any([distance(pixel, n) > seuil_distance for n in neighbours]):
+            if any([distance(pixel, n) >= seuil_distance for n in neighbours]):
                 result.putpixel((x, y), (0, 0, 0))
+            #print([distance(pixel, n) for n in neighbours])
 
     if display:
         result.show()
@@ -353,7 +355,7 @@ def load_map(img_path: str = "", img_signature: str = None) -> dict:
         return None
 
 if __name__ == "__main__":
-    img = get_outlines("assets/imgs/regions_france.jpg", display=True)
+    img = get_outlines("assets/imgs/pays_afrique.webp", display=True)
     regions_pixels, img_regions = get_regions_pixels(img, display=True)
     regions = [Region(r) for r in regions_pixels]
 
