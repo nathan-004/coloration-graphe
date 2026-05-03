@@ -1,15 +1,22 @@
+"""
+Auteurs: Nathan
+Contient la classe Graphe utilisé lors de la coloration + moyens de création
+"""
+
 from collections import defaultdict
 from typing import NamedTuple
 
 from map import *
 
 class FromImageResult(NamedTuple):
+    """Renvoie les éléments crées lors de l'initialisation du graphe par une image"""
     graphe: dict
-    img: type(Image)
+    img: type(Image) # img: Image ne fonctionnait pas sur Edupython
     regions: list # list[Region]
     map_id: str
 
 class FromIdResult(NamedTuple):
+    """Renvoie les éléments nécessaires au coloriage du graphe"""
     graphe: dict
 
 class Graphe(dict):
@@ -85,7 +92,16 @@ class Graphe(dict):
 
     @staticmethod
     def from_map_image(img_path: str, display: bool = False) -> FromImageResult:
-        map_result = load_map(img_path)
+        """
+        Génère le graphe à partir d'une image
+
+        Parameters
+        ----------
+        img_path: str
+        display: bool
+            Si les résultats de chaque étapes doivent être affichés
+        """
+        map_result = load_map(img_path) # Tente de charger la map si déjà existante
 
         if map_result is not None:
             print(f"Sauvegarde trouvée pour {img_path}")
@@ -120,7 +136,10 @@ class Graphe(dict):
         )
 
     @staticmethod
-    def from_map_id(id:str, display: bool = False) -> FromIdResult:
+    def from_map_id(id:str) -> FromIdResult:
+        """
+        Même méthode que `from_map_image` mais en ne calculant pas les pixels des régions
+        """
         map_result = load_map(img_signature=id)
 
         if map_result is not None:
@@ -133,6 +152,10 @@ class Graphe(dict):
             )
 
 def get_regions_france() -> Graphe:
+    """
+    Renvoie un graphe de test sur les régions de France
+    """
+
     noms_regions = [
         "Hauts-de-France",
         "Normandie", "Île de France", "Grand Est",
