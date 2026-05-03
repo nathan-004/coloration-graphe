@@ -91,12 +91,12 @@ def color():
             "status": "error"
         }), 404
 
-# result = Graphe.from_map_image("assets/imgs/regions_france.jpg")
-# graph = result.graphe #get_regions_france()
+#result = Graphe.from_map_image("assets/imgs/regions_france.jpg")
+#graph = result.graphe #get_regions_france()
 
 # #color_random(graph)
 # color_random_rules(graph)
 
-# display_graph(graph)
+#display_graph(graph)
 
 app.run(host="0.0.0.0")

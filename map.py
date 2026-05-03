@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 import hashlib
 import json
-
+from collections import defaultdict
 
 from utils import bar_animation
 
@@ -57,12 +57,8 @@ class Region(dict):
 
     @property
     def center(self):
-        minx, miny, maxx, maxy = self.bbox
-
-        return (
-            (minx + maxx) / 2,
-            (maxy + miny) / 2
-        )
+        x, y = sum([point[0] for point in self.pixels]), sum([point[1] for point in self.pixels])
+        return int(x/len(self.pixels)), int(y/len(self.pixels))
 
 def distance(p1: tuple, p2: tuple) -> float:
     dr = p1[0] - p2[0]
@@ -247,76 +243,44 @@ def collide_bbox(r1: Region, r2: Region) -> bool:
         r2.bbox.miny > r2.bbox.maxy
     )
 
-def regions_touch(r1: Region, r2: Region, pixels, img_size: tuple, display: bool = False) -> bool:
-    res = Image.new("RGB", img_size)
-    outline_pixels = [
-        (x, y) for x, y in r1.pixels
-        if any([pixels[x+var_x, y+var_y] != (255, 255, 255) for var_x in range(-1, 2) for var_y in range(-1, 2)
-                if 0 <= x + var_x < img_size[0] and 0 <= y + var_y < img_size[1]
-            ])
-    ]
+def dilate_region(region_pixels: Region, pixels, img_size, iterations = 1):
+    w, h = img_size
+    current = set(region_pixels)
 
-    for pixel in outline_pixels:
-        res.putpixel(pixel, (255, 0, 0))
+    for _ in range(iterations):
+        new_pixels = set(current)
 
-    outline_pixels.sort(key = lambda x : ((r2.center[0] - x[0])**2 + (r2.center[1] - x[1])**2)**0.5)
+        for x, y in current:
+            for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]:  # 4-connexité
+                nx, ny = x + dx, y + dy
 
-    dest = r2.center
+                if 0 <= nx < w and 0 <= ny < h:
+                    if pixels[nx, ny] == (255, 255, 255) or pixels[nx, ny] == (0, 0, 0):
+                        new_pixels.add((nx, ny))
 
-    res.putpixel((int(dest[0]), int(dest[1])), (255, 0, 0))
+        current = new_pixels
 
-    pixs_r1 = set(r1.pixels)
-    pixs_r2 = set(r2.pixels)
-
-    for x, y in outline_pixels:
-        cur_pos = (x, y)
-        visited = set()
-
-        while True:
-            if cur_pos in pixs_r2 or cur_pos == dest:
-                if display:
-                    res.show()
-                return True
-
-            if pixels[cur_pos] == (255, 255, 255) and not cur_pos in pixs_r1: # Pixel blanc pas dans r1 ou r2
-                break
-
-            min_d = float("inf")
-            next_pos = None
-
-            for nx in range(cur_pos[0]-1, cur_pos[0]+2):
-                for ny in range(cur_pos[1]-1, cur_pos[1]+2):
-                    if (nx, ny) == cur_pos or (nx, ny) in visited:
-                        continue
-
-                    d = ((dest[0] - nx)**2 + (dest[1] - ny)**2) ** 0.5
-                    if d < min_d:
-                        min_d = d
-                        next_pos = (nx, ny)
-
-            if next_pos is not None:
-                cur_pos = next_pos
-                res.putpixel(cur_pos, (0, 255, 0))
-            else:
-                break
-
-            visited.add(cur_pos)
-    if display:
-        res.show()
-    return False
+    return current
 
 def get_graph(regions: list, img: Image) -> dict:
     dic = {}
-    ps = img.load()
+    dilated_regions = []
+    pixels = img.load()
 
-    for idx, cur_r in bar_animation(regions, title="Création du graphe", refresh= 1,get_idx=True):
+    for idx, cur_r in bar_animation(regions, title="Création du graphe", refresh= 1, get_idx=True):
+        dilated_regions.append(dilate_region(cur_r.pixels, pixels, img.size, 10))
+
+    for idx, cur_r in enumerate(regions):
         neighbours = []
         for idx2, r2 in enumerate(regions):
             if idx == idx2:
                 continue
-
+            
             if collide_bbox(cur_r, r2):
-                if regions_touch(cur_r, r2, ps, (img.width, img.height)):
+                print("Collide bbox")
+                print(dilated_regions[idx] & dilated_regions[idx2])
+                if dilated_regions[idx] & dilated_regions[idx2]:
+                    print("Collide regions touche")
                     neighbours.append(idx2)
         dic[idx] = neighbours
 
@@ -355,11 +319,9 @@ def load_map(img_path: str = "", img_signature: str = None) -> dict:
         return None
 
 if __name__ == "__main__":
-    img = get_outlines("assets/imgs/pays_afrique.webp", display=True)
+    img = get_outlines("assets/imgs/regions_angleterre.png", display=True)
     regions_pixels, img_regions = get_regions_pixels(img, display=True)
     regions = [Region(r) for r in regions_pixels]
 
     display_regions(regions)
     print(get_graph(regions, img))
-
-    assert regions_touch(regions[0], regions[1], img.load(), (img.width, img.height))
