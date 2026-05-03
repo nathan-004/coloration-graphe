@@ -1,3 +1,8 @@
+"""
+Auteurs: Nathan
+Offre quelques fonctionnalités d'affichage notamment
+"""
+
 import networkx as nx
 import matplotlib.pyplot as plt
 

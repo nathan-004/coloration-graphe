@@ -1,4 +1,5 @@
 async function upload() {
+    // Envoie le fichier entré au backend
     const files = document.getElementById("imgInput").files;
     const file = files[0];
 

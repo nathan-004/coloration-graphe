@@ -1,3 +1,8 @@
+"""
+Auteurs: Hugo, Nathan
+Permet de colorier les graphes suivant différents algorithmes
+"""
+
 import random
 
 from graph import Graphe
@@ -77,13 +82,13 @@ def color_glouton(graph: Graphe):
 
 def color_welsh_powell(graph: Graphe):
     result = []
-    nodes = sorted(list(graph.keys()), key = lambda x: len(graph[x]), reverse = True)
+    nodes = sorted(list(graph.keys()), key = lambda x: len(graph[x]), reverse = True) # Trier les sommets en fonction de leur degré
     color = (1, 0, 0)
     idx = 0
 
     while nodes:
         n = nodes[idx]
-        if not(any([graph.colors[v] == color for v in graph[n]])):
+        if not(any([graph.colors[v] == color for v in graph[n]])): # Aucun des voisins n'a la même couleur
             graph.colors[n] = color
             result.append({n: color})
             nodes.pop(idx)
@@ -99,12 +104,12 @@ def color_welsh_powell(graph: Graphe):
     return result
 
 def color_dsatur(g: Graphe):
-    def dsat(n):
+    def dsat(n): # Fonction de calcul de la saturation
         return len(set([
             g.colors[v] for v in g[n] if g.colors[v] is not None
         ]))
 
-    nodes = sorted(list(g.keys()), key = lambda x: len(g[x]), reverse = True)
+    nodes = sorted(list(g.keys()), key = lambda x: len(g[x]), reverse = True) # Tri par degré
     colors = [(1, 0, 0)]
 
     if len(nodes) == 0:
@@ -115,10 +120,10 @@ def color_dsatur(g: Graphe):
     result = [{f: colors[0]},]
 
     while nodes:
-        n = max(nodes, key= lambda x : (dsat(x), len(g[x])))
+        n = max(nodes, key= lambda x : (dsat(x), len(g[x]))) # Trouver le dsat maximum ou le degré en cas d'égalité 
 
         for col in colors:
-            if all([col != g.colors[v] for v in g[n] if g.colors[v] is not None]):
+            if all([col != g.colors[v] for v in g[n] if g.colors[v] is not None]): # Vérifier que voisins n'ont pas la même couleur
                 g.colors[n] = col
                 break
         else:

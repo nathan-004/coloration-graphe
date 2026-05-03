@@ -58,7 +58,7 @@ Pour colorier la carte, il éxécute l'algorithme Flood fill vu précedemment en
 
 D'abord la résolutions de problèmes telles que des faux négatifs dans la détection des régions lorsque les régions sont trop petites, il faudrait ajuster l'aire minimale d'une région en fonction de la taille moyenne ou en fonction de la taille de l'image et du nombre de région obtenue ? Aussi des problèmes de détections de régions limitrophes dans le cas de contours trop épais.
 
-Ensuite l'ajout d'un algorithme de sélection des terres et des mers / océans plus poussés, pour l'instant ce n'est que regarder si une région touche le bord de l'image. Aussi ajouter plus de possibilités de customisation du résultat dans l'upload d'une image notamment. Et enfin faire la page `Voir cartes déjà existantes`.
+Ensuite l'ajout d'un algorithme de sélection des terres et des mers / océans plus poussés, pour l'instant ce n'est que regarder si une région touche le bord de l'image. Aussi ajouter plus de possibilités de customisation du résultat dans l'upload d'une image notamment. Et enfin faire la page `Voir cartes déjà existantes` et ajouter un bouton autoplay de l'animation de coloriage. 
 
 ### Lancer le projet
 

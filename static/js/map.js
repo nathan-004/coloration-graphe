@@ -14,6 +14,7 @@ let colors = [];
 let regions = {};
 
 function color(centers, colors, ctx, canvas) {
+    // Colorie le canvas en utilisant l'algorithme flood fill
     const imgd = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pix = imgd.data;
 

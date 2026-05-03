@@ -1,7 +1,11 @@
+"""
+Auteurs: Nathan
+Permet de renvoyer une carte coloriable à partir d'une image
+"""
+
 from PIL import Image, ImageDraw, ImageFont
 import hashlib
 import json
-from collections import defaultdict
 
 from utils import bar_animation
 
@@ -11,6 +15,7 @@ from collections import deque
 from typing import NamedTuple
 
 class Bbox(NamedTuple):
+    """Carré minimal dans lequel la région loge"""
     minx: int
     miny: int
     maxx: int
@@ -57,10 +62,12 @@ class Region(dict):
 
     @property
     def center(self):
+        """Attention : Peut ne pas être dans la région"""
         x, y = sum([point[0] for point in self.pixels]), sum([point[1] for point in self.pixels])
         return int(x/len(self.pixels)), int(y/len(self.pixels))
 
 def distance(p1: tuple, p2: tuple) -> float:
+    """Calcul de la distance entre 2 couleurs"""
     dr = p1[0] - p2[0]
     dg = p1[1] - p2[1]
     db = p1[2] - p2[2]
@@ -68,6 +75,10 @@ def distance(p1: tuple, p2: tuple) -> float:
     return (dr**2 + dg**2 + db**2)**0.5
 
 def get_thresold(pixels: Image, w, h):
+    """
+    Renvoie le seuil de différence de couleur maximal autorisé
+    Calcul de la moyenne de distance entre les couleurs
+    """
     diffs = []
 
     for y in range(h):
@@ -89,9 +100,9 @@ def get_thresold(pixels: Image, w, h):
     return sum(diffs)/len(diffs)
 
 def get_outlines(img_path: str, seuil_distance: float = None, display: bool = True) -> Image:
-    """Renvoie une image noir et blanc (noir pour contour)"""
+    """Renvoie une image noir et blanc (noir pour contour, blanc pour autre)"""
     img = Image.open(img_path).convert("RGBA")
-    pixels = img.load()
+    pixels = img.load() # Permet d'accéder aux pixels de l'image plus rapidement
 
     if seuil_distance is None:
         seuil_distance = get_thresold(pixels, *img.size)
@@ -117,7 +128,7 @@ def get_outlines(img_path: str, seuil_distance: float = None, display: bool = Tr
                         if neighbour[3] == 255:
                             neighbours.append(neighbour)
 
-            if any([distance(pixel, n) >= seuil_distance for n in neighbours]):
+            if any([distance(pixel, n) >= seuil_distance for n in neighbours]): # Si au moins des voisins a une couleur différente dépassant le seuil maximal 
                 result.putpixel((x, y), (0, 0, 0))
             #print([distance(pixel, n) for n in neighbours])
 
@@ -206,6 +217,7 @@ def display_regions(regions: list, width: int = None, height: int = None) -> Ima
             result.putpixel((x, y), (255, 255, 255))
 
     pixels = result.load()
+
     for region in regions:
         bbox = region.bbox
 
@@ -244,6 +256,9 @@ def collide_bbox(r1: Region, r2: Region) -> bool:
     )
 
 def dilate_region(region_pixels: Region, pixels, img_size, iterations = 1):
+    """
+    Ajoute un pixel s'il est voisin à un pixel de la région
+    """
     w, h = img_size
     current = set(region_pixels)
 
@@ -251,7 +266,7 @@ def dilate_region(region_pixels: Region, pixels, img_size, iterations = 1):
         new_pixels = set(current)
 
         for x, y in current:
-            for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]:  # 4-connexité
+            for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]:
                 nx, ny = x + dx, y + dy
 
                 if 0 <= nx < w and 0 <= ny < h:
@@ -263,6 +278,7 @@ def dilate_region(region_pixels: Region, pixels, img_size, iterations = 1):
     return current
 
 def get_graph(regions: list, img: Image) -> dict:
+    """Renvoie la matrice d'adjacence en regardant les régions limitrophes"""
     dic = {}
     dilated_regions = []
     pixels = img.load()
@@ -277,10 +293,7 @@ def get_graph(regions: list, img: Image) -> dict:
                 continue
             
             if collide_bbox(cur_r, r2):
-                print("Collide bbox")
-                print(dilated_regions[idx] & dilated_regions[idx2])
                 if dilated_regions[idx] & dilated_regions[idx2]:
-                    print("Collide regions touche")
                     neighbours.append(idx2)
         dic[idx] = neighbours
 
