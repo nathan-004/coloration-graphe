@@ -8,6 +8,15 @@
 - [X] Algorithmes de coloration
 - [X] Mettre les régions coupées en bleu
 
+### Lancer le projet
+
+Lancer plusieurs aura différents effets :
+- `color.py` permet de voir la coloration des graphes
+- `map.py` permet de voir le processus de passage d'une image à une carte coloriable
+- `main.py` permet de lancer le serveur web
+
+⚠ Attention : Certaines fonctionnalités du programme ne sont pas fonctionnels sur EduPython ou les ordinateurs du lycée. Parmi elles : l'animation textuelle de progrès et la suppression des fichiers temporaires dans `assets/temp`.
+
 ### Compte Rendu
 
 L'objectif était de créer une interface utilisateur permettant de montrer différents algorithmes de coloration de graphes en action. Pour cela il a fallu se poser plusieurs questions, la première étant d'avoir une carte que l'on pouvait colorier.
@@ -59,12 +68,3 @@ Pour colorier la carte, il éxécute l'algorithme Flood fill vu précedemment en
 D'abord la résolutions de problèmes telles que des faux négatifs dans la détection des régions lorsque les régions sont trop petites, il faudrait ajuster l'aire minimale d'une région en fonction de la taille moyenne ou en fonction de la taille de l'image et du nombre de région obtenue ? Aussi des problèmes de détections de régions limitrophes dans le cas de contours trop épais.
 
 Ensuite l'ajout d'un algorithme de sélection des terres et des mers / océans plus poussés, pour l'instant ce n'est que regarder si une région touche le bord de l'image. Aussi ajouter plus de possibilités de customisation du résultat dans l'upload d'une image notamment. Et enfin faire la page `Voir cartes déjà existantes` et ajouter un bouton autoplay de l'animation de coloriage. 
-
-### Lancer le projet
-
-Lancer plusieurs aura différents effets :
-- `color.py` permet de voir la coloration des graphes
-- `map.py` permet de voir le processus de passage d'une image à une carte coloriable
-- `main.py` permet de lancer le serveur web
-
-⚠ Attention : Certaines fonctionnalités du programme ne sont pas fonctionnels sur EduPython ou les ordinateurs du lycée. Parmi elles : l'animation textuelle de progrès et la suppression des fichiers temporaires dans `assets/temp`.
